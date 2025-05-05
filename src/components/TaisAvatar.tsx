@@ -58,7 +58,8 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
     const avgVolume = dataArrayRef.current.reduce((sum, val) => sum + val, 0) / dataArrayRef.current.length;
     
     // Switch between images based on volume threshold
-    if (avgVolume > 30) {
+    // Using a higher threshold for clearer visual distinction
+    if (avgVolume > 40) {
       avatarRef.current.src = "/images/tais_open.png";
     } else {
       avatarRef.current.src = "/images/tais_closed.png";
@@ -75,9 +76,9 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
         id="tais-avatar"
         src="/images/tais_closed.png" 
         alt="Taís Braga"
-        className="w-full max-w-md mx-auto transition-all duration-100 ease-in-out"
+        className="w-full max-w-md rounded-lg shadow-lg mx-auto transition-all duration-100 ease-in-out"
       />
-      <p className="text-sm text-gray-500 mt-2">Agente Virtual Taís Braga</p>
+      <p className="text-lg font-medium text-gray-800 mt-3">Agente Virtual Taís Braga</p>
     </div>
   );
 };
