@@ -1,17 +1,12 @@
-
 import { useState } from "react";
 import TaisAvatar from "@/components/TaisAvatar";
 import VoiceAgent from "@/components/VoiceAgent";
-
 const Index = () => {
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
-
   const handleAudioElementReady = (element: HTMLAudioElement) => {
     setAudioElement(element);
   };
-
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
+  return <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
       <div className="container max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-6">Agente Virtual Taís Braga</h1>
         
@@ -28,7 +23,7 @@ const Index = () => {
               <ol className="list-decimal list-inside text-sm text-blue-800 space-y-1">
                 <li>Clique no botão do microfone abaixo para iniciar</li>
                 <li>Faça uma pergunta para a Taís Braga</li>
-                <li>Observe como a boca da Taís se movimenta enquanto ela responde</li>
+                <li>Boa Conversa</li>
               </ol>
             </div>
           </div>
@@ -39,8 +34,6 @@ const Index = () => {
           <p className="mt-1">Powered by ElevenLabs</p>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
