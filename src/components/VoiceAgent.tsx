@@ -6,6 +6,17 @@ interface VoiceAgentProps {
   onAudioElementReady: (audioElement: HTMLAudioElement) => void;
 }
 
+// Define the custom element for TypeScript
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'elevenlabs-convai': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        'agent-id': string;
+      }
+    }
+  }
+}
+
 const VoiceAgent = ({ onAudioElementReady }: VoiceAgentProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);

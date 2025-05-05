@@ -1,11 +1,20 @@
 
+// Define AudioContext properly for TypeScript
+declare global {
+  interface Window {
+    webkitAudioContext: typeof AudioContext;
+  }
+}
+
 // This file will be used if we need additional audio processing functionality
 export const calculateAverageVolume = (dataArray: Uint8Array): number => {
   return dataArray.reduce((sum, val) => sum + val, 0) / dataArray.length;
 };
 
 export const setupAudioAnalyzer = (audioElement: HTMLAudioElement) => {
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  // Fix the AudioContext instantiation
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  const audioContext = new AudioContextClass();
   const analyser = audioContext.createAnalyser();
   analyser.fftSize = 256;
   
@@ -33,7 +42,9 @@ export const setupAudioAnalyzer = (audioElement: HTMLAudioElement) => {
 export const createMicrophoneAnalyzer = async () => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    // Fix the AudioContext instantiation
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    const audioContext = new AudioContextClass();
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 256;
     

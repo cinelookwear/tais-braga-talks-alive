@@ -16,7 +16,9 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
     if (!audioAnalyzer) return;
     
     // Initialize audio context and analyzer
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    // Fix the webkitAudioContext error by handling it properly
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    const audioContext = new AudioContextClass();
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 256;
     
@@ -52,7 +54,8 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
     analyserRef.current.getByteFrequencyData(dataArrayRef.current);
     
     // Calculate average volume across frequencies
-    const avgVolume = dataArrayRef.current.reduce((sum, val) => sum + val, 0) / dataArrayRef.current.frequencyBinCount;
+    // Fix: Use the length property instead of frequencyBinCount on dataArray
+    const avgVolume = dataArrayRef.current.reduce((sum, val) => sum + val, 0) / dataArrayRef.current.length;
     
     // Switch between images based on volume threshold
     if (avgVolume > 30) {
