@@ -59,8 +59,10 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
     // Using a higher threshold for clearer visual distinction
     if (avgVolume > 40) {
       avatarRef.current.src = "/lovable-uploads/6a62777d-43a0-4d35-9a1f-c7b994fd4bd9.png";
+      console.log("Mouth open image: /lovable-uploads/6a62777d-43a0-4d35-9a1f-c7b994fd4bd9.png");
     } else {
       avatarRef.current.src = "/lovable-uploads/7c76c577-5921-45c9-8c25-9f0fca607b25.png";
+      console.log("Mouth closed image: /lovable-uploads/7c76c577-5921-45c9-8c25-9f0fca607b25.png");
     }
     
     // Continue animation loop
@@ -75,6 +77,11 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
         src="/lovable-uploads/7c76c577-5921-45c9-8c25-9f0fca607b25.png" 
         alt="Taís Braga"
         className="w-full max-w-md rounded-lg shadow-lg mx-auto transition-all duration-100 ease-in-out"
+        onError={(e) => {
+          console.error("Error loading image:", e);
+          // Provide a fallback if image fails to load
+          e.currentTarget.src = "/placeholder.svg";
+        }}
       />
       <p className="text-lg font-medium text-gray-800 mt-3">Agente Virtual Taís Braga</p>
     </div>

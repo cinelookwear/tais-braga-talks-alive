@@ -1,11 +1,37 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import TaisAvatar from "@/components/TaisAvatar";
 import VoiceAgent from "@/components/VoiceAgent";
+
 const Index = () => {
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  
   const handleAudioElementReady = (element: HTMLAudioElement) => {
+    console.log("Audio element ready:", element);
     setAudioElement(element);
   };
+  
+  useEffect(() => {
+    // Verificar se as imagens estão disponíveis
+    const checkImages = async () => {
+      try {
+        const img1Response = await fetch('/lovable-uploads/7c76c577-5921-45c9-8c25-9f0fca607b25.png');
+        const img2Response = await fetch('/lovable-uploads/6a62777d-43a0-4d35-9a1f-c7b994fd4bd9.png');
+        
+        console.log("Closed mouth image status:", img1Response.status);
+        console.log("Open mouth image status:", img2Response.status);
+        
+        if (!img1Response.ok || !img2Response.ok) {
+          console.error("Imagens não encontradas. Por favor, faça o upload novamente.");
+        }
+      } catch (error) {
+        console.error("Erro ao verificar imagens:", error);
+      }
+    };
+    
+    checkImages();
+  }, []);
+  
   return <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
       <div className="container max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-6">Agente Virtual Taís Braga</h1>
@@ -36,4 +62,5 @@ const Index = () => {
       </div>
     </div>;
 };
+
 export default Index;
