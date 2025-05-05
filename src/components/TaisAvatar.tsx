@@ -16,7 +16,6 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
     if (!audioAnalyzer) return;
     
     // Initialize audio context and analyzer
-    // Fix the webkitAudioContext error by handling it properly
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
     const audioContext = new AudioContextClass();
     const analyser = audioContext.createAnalyser();
@@ -54,15 +53,14 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
     analyserRef.current.getByteFrequencyData(dataArrayRef.current);
     
     // Calculate average volume across frequencies
-    // Fix: Use the length property instead of frequencyBinCount on dataArray
     const avgVolume = dataArrayRef.current.reduce((sum, val) => sum + val, 0) / dataArrayRef.current.length;
     
     // Switch between images based on volume threshold
     // Using a higher threshold for clearer visual distinction
     if (avgVolume > 40) {
-      avatarRef.current.src = "/images/tais_open.png";
+      avatarRef.current.src = "/lovable-uploads/6a62777d-43a0-4d35-9a1f-c7b994fd4bd9.png";
     } else {
-      avatarRef.current.src = "/images/tais_closed.png";
+      avatarRef.current.src = "/lovable-uploads/7c76c577-5921-45c9-8c25-9f0fca607b25.png";
     }
     
     // Continue animation loop
@@ -74,7 +72,7 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
       <img 
         ref={avatarRef}
         id="tais-avatar"
-        src="/images/tais_closed.png" 
+        src="/lovable-uploads/7c76c577-5921-45c9-8c25-9f0fca607b25.png" 
         alt="Taís Braga"
         className="w-full max-w-md rounded-lg shadow-lg mx-auto transition-all duration-100 ease-in-out"
       />
