@@ -15,14 +15,14 @@ const Index = () => {
     // Verificar se as imagens estão disponíveis
     const checkImages = async () => {
       try {
-        const img1Response = await fetch('/lovable-uploads/7c76c577-5921-45c9-8c25-9f0fca607b25.png');
-        const img2Response = await fetch('/lovable-uploads/6a62777d-43a0-4d35-9a1f-c7b994fd4bd9.png');
+        const img1Response = await fetch('/lovable-uploads/e659eeed-15d3-4bc0-b51f-9b993c5ff130.png');
+        const img2Response = await fetch('/lovable-uploads/4f134e66-6340-4425-a349-9a5425b5ca13.png');
         
         console.log("Closed mouth image status:", img1Response.status);
         console.log("Open mouth image status:", img2Response.status);
         
         if (!img1Response.ok || !img2Response.ok) {
-          console.error("Imagens não encontradas. Por favor, faça o upload novamente.");
+          console.error("Imagens não encontradas. Por favor, verifique os caminhos das imagens.");
         }
       } catch (error) {
         console.error("Erro ao verificar imagens:", error);

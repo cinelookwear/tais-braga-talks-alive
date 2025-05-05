@@ -12,6 +12,10 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
   
+  // Caminhos das imagens
+  const closedMouthImage = "/lovable-uploads/e659eeed-15d3-4bc0-b51f-9b993c5ff130.png";
+  const openMouthImage = "/lovable-uploads/4f134e66-6340-4425-a349-9a5425b5ca13.png";
+  
   useEffect(() => {
     if (!audioAnalyzer) return;
     
@@ -58,11 +62,11 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
     // Switch between images based on volume threshold
     // Using a higher threshold for clearer visual distinction
     if (avgVolume > 40) {
-      avatarRef.current.src = "/lovable-uploads/6a62777d-43a0-4d35-9a1f-c7b994fd4bd9.png";
-      console.log("Mouth open image: /lovable-uploads/6a62777d-43a0-4d35-9a1f-c7b994fd4bd9.png");
+      avatarRef.current.src = openMouthImage;
+      console.log("Mouth open image:", openMouthImage);
     } else {
-      avatarRef.current.src = "/lovable-uploads/7c76c577-5921-45c9-8c25-9f0fca607b25.png";
-      console.log("Mouth closed image: /lovable-uploads/7c76c577-5921-45c9-8c25-9f0fca607b25.png");
+      avatarRef.current.src = closedMouthImage;
+      console.log("Mouth closed image:", closedMouthImage);
     }
     
     // Continue animation loop
@@ -74,7 +78,7 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
       <img 
         ref={avatarRef}
         id="tais-avatar"
-        src="/lovable-uploads/7c76c577-5921-45c9-8c25-9f0fca607b25.png" 
+        src={closedMouthImage} 
         alt="Taís Braga"
         className="w-full max-w-md rounded-lg shadow-lg mx-auto transition-all duration-100 ease-in-out"
         onError={(e) => {
