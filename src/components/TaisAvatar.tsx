@@ -12,6 +12,7 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   
   // Caminhos das 14 imagens para sincronia labial
   const mouthImages = [
@@ -33,6 +34,26 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
   
   useEffect(() => {
     if (!audioAnalyzer) return;
+    
+    // Monitorar quando o áudio começa e para
+    const handlePlay = () => {
+      console.log("Áudio começou a tocar");
+      setIsAudioPlaying(true);
+    };
+    
+    const handlePause = () => {
+      console.log("Áudio pausado");
+      setIsAudioPlaying(false);
+    };
+    
+    const handleEnded = () => {
+      console.log("Áudio terminou");
+      setIsAudioPlaying(false);
+    };
+    
+    audioAnalyzer.addEventListener('play', handlePlay);
+    audioAnalyzer.addEventListener('pause', handlePause);
+    audioAnalyzer.addEventListener('ended', handleEnded);
     
     // Initialize audio context and analyzer
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
@@ -57,6 +78,10 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
     animateMouth();
     
     return () => {
+      audioAnalyzer.removeEventListener('play', handlePlay);
+      audioAnalyzer.removeEventListener('pause', handlePause);
+      audioAnalyzer.removeEventListener('ended', handleEnded);
+      
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
@@ -68,23 +93,46 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
   
   // Função para mapear o volume para um índice de imagem
   const getImageIndexFromVolume = (volume: number): number => {
-    // Calibração para mapear o volume (geralmente 0-255) para índices de imagem (0-13)
-    // Ajuste esses valores conforme necessário para melhor sincronia labial
-    if (volume < 15) return 0; // boca fechada para volume baixo
+    // Se não estiver reproduzindo áudio, mantenha a boca fechada
+    if (!isAudioPlaying) return 0;
     
-    // Mapeia o volume para um dos 14 frames
-    // Para uma distribuição mais uniforme: (volume / volumeMax) * (totalFrames - 1)
-    const index = Math.min(Math.floor((volume / 100) * 13), 13);
+    // Calibração mais sensível para mapear o volume para índices de imagem
+    if (volume < 5) return 0; // boca fechada para volume muito baixo
+    
+    // Ajuste os limiares para melhor detecção de áudio
+    // Mapeia o volume para um dos 14 frames com mais sensibilidade
+    const volumeMax = 100;
+    const normalizedVolume = Math.min(volume, volumeMax);
+    const index = Math.min(Math.floor((normalizedVolume / volumeMax) * 13), 13);
+    
+    console.log(`Volume: ${volume.toFixed(2)}, Mouth frame: ${index}, Audio playing: ${isAudioPlaying}`);
     return index;
   };
   
   const animateMouth = () => {
-    if (!analyserRef.current || !dataArrayRef.current || !avatarRef.current) return;
+    if (!analyserRef.current || !dataArrayRef.current || !avatarRef.current) {
+      animationRef.current = requestAnimationFrame(animateMouth);
+      return;
+    }
     
     analyserRef.current.getByteFrequencyData(dataArrayRef.current);
     
     // Calculate average volume across frequencies
-    const avgVolume = dataArrayRef.current.reduce((sum, val) => sum + val, 0) / dataArrayRef.current.length;
+    // Dando maior peso para frequências médias onde a voz humana é mais prominente
+    let weightedSum = 0;
+    let totalWeight = 0;
+    
+    for (let i = 0; i < dataArrayRef.current.length; i++) {
+      // Frequências médias (onde a voz geralmente está) recebem maior peso
+      let weight = 1;
+      if (i > 5 && i < 50) {
+        weight = 3; // Maior peso para frequências vocais
+      }
+      weightedSum += dataArrayRef.current[i] * weight;
+      totalWeight += weight;
+    }
+    
+    const avgVolume = totalWeight > 0 ? weightedSum / totalWeight : 0;
     
     // Obter índice da imagem com base no volume
     const imageIndex = getImageIndexFromVolume(avgVolume);
@@ -92,8 +140,9 @@ const TaisAvatar = ({ audioAnalyzer }: TaisAvatarProps) => {
     // Atualizar imagem apenas se o índice mudar (otimização)
     if (imageIndex !== currentImageIndex) {
       setCurrentImageIndex(imageIndex);
-      avatarRef.current.src = mouthImages[imageIndex];
-      console.log(`Volume: ${avgVolume.toFixed(2)}, Mouth frame: ${imageIndex}`);
+      if (avatarRef.current) {
+        avatarRef.current.src = mouthImages[imageIndex];
+      }
     }
     
     // Continue animation loop

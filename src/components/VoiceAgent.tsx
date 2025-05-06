@@ -20,6 +20,7 @@ declare global {
 const VoiceAgent = ({ onAudioElementReady }: VoiceAgentProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const findIntervalRef = useRef<number | null>(null);
   
   useEffect(() => {
     // Add the ElevenLabs script
@@ -31,26 +32,47 @@ const VoiceAgent = ({ onAudioElementReady }: VoiceAgentProps) => {
     // Return cleanup function
     return () => {
       document.body.removeChild(script);
+      
+      // Limpar o intervalo se ele ainda existir
+      if (findIntervalRef.current) {
+        clearInterval(findIntervalRef.current);
+      }
     };
   }, []);
 
   useEffect(() => {
-    // Wait for the widget to be loaded and find the audio element
-    const findAudioElement = setInterval(() => {
-      if (containerRef.current) {
-        const audio = document.querySelector("audio") as HTMLAudioElement;
+    // Função para encontrar o elemento de áudio e transmiti-lo para o componente pai
+    const findAudioElement = () => {
+      const audio = document.querySelector("audio") as HTMLAudioElement;
+      
+      if (audio && audio !== audioRef.current) {
+        audioRef.current = audio;
+        onAudioElementReady(audio);
+        console.log("Elemento de áudio encontrado e passado para o componente pai");
         
-        if (audio && audio !== audioRef.current) {
-          audioRef.current = audio;
-          onAudioElementReady(audio);
-          clearInterval(findAudioElement);
-          console.log("Audio element found and passed to parent");
+        // Adicionar informações de depuração para o elemento de áudio
+        audio.addEventListener('play', () => console.log("Áudio começou a tocar (de VoiceAgent)"));
+        audio.addEventListener('pause', () => console.log("Áudio pausado (de VoiceAgent)"));
+        audio.addEventListener('ended', () => console.log("Áudio terminou (de VoiceAgent)"));
+        
+        // Limpar o intervalo depois de encontrar o elemento de áudio
+        if (findIntervalRef.current) {
+          clearInterval(findIntervalRef.current);
+          findIntervalRef.current = null;
         }
       }
-    }, 1000);
+    };
+    
+    // Verifica repetidamente até encontrar o elemento de áudio
+    findIntervalRef.current = window.setInterval(findAudioElement, 500);
+    
+    // Tentar encontrar o elemento de áudio imediatamente
+    findAudioElement();
     
     return () => {
-      clearInterval(findAudioElement);
+      if (findIntervalRef.current) {
+        clearInterval(findIntervalRef.current);
+      }
     };
   }, [onAudioElementReady]);
 
